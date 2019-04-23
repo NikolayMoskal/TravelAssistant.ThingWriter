@@ -11,7 +11,7 @@ namespace ThingWriter
     {
         public static void Main(string[] args)
         {
-            var file = @"all_things.json";
+            const string file = @"all_things.json";
 
             var serializer = new JsonSerializer
             {
@@ -19,21 +19,26 @@ namespace ThingWriter
                 Formatting = Formatting.Indented
             };
 
-            var array = File.Exists(file)
-                ? JArray.Parse(File.ReadAllText(@"all_things.json", Encoding.UTF8))
-                : new JArray();
+            var array = new JArray();
+            if (File.Exists(file) && new FileInfo(file).Length > 0)
+            {
+                array = JArray.Parse(File.ReadAllText(@"all_things.json", Encoding.UTF8));
+            }
             var isContinue = true;
 
             while (isContinue)
             {
                 var thing = new Thing();
-                Console.Write("Thing name: ");
-                thing.ThingName = Console.ReadLine();
+                Console.Write("Thing name EN-US: ");
+                thing.ThingNameEn = Console.ReadLine();
+                Console.Write("Thing name RU-RU: ");
+                thing.ThingNameRu = Console.ReadLine();
+
                 Console.WriteLine("Type: ");
                 Console.WriteLine("1 - Документы\n2 - Техника\n3 - Бытовые мелочи, комфорт и удобство\n" +
                     "4 - Гигиена и косметика\n5 - Верхняя одежда\n6 - Повседневная одежда\n7 - Нательное белье\n" +
                     "8 - Аксессуары\n9 - Украшения\n10 - Выходная одежда\n11 - Обувь\n12 - Головные уборы\n13 - Детские вещи");
-                int type = Convert.ToInt32(Console.ReadLine());
+                var type = Convert.ToInt32(Console.ReadLine());
                 switch (type)
                 {
                     case 1: thing.Type = "documents"; break;
@@ -54,7 +59,7 @@ namespace ThingWriter
                 Console.WriteLine("1 - Туризм\n2 - Велотуризм\n3 - Зима\n4 - Пляж\n5 - Командировка\n" +
                     "6 - Дайвинг\n7 - Самое необходимое\n8 - Фотография\n9 - Рыбалка\n10 - Поход\n" +
                     "11 - Туалет\n12 - Дети\n13 - Ресторан\n14 - Путешествие");
-                int category = Convert.ToInt32(Console.ReadLine());
+                var category = Convert.ToInt32(Console.ReadLine());
                 switch (category)
                 {
                     case 1: thing.Category = "tourism"; break;
@@ -72,10 +77,14 @@ namespace ThingWriter
                     case 13: thing.Category = "restaurant"; break;
                     case 14: thing.Category = "travel"; break;
                 }
+                Console.WriteLine("Weight: ");
+                thing.Weight = Convert.ToDouble(Console.ReadLine());
+
                 array.Add(JObject.FromObject(thing, serializer));
 
                 Console.Write("Continue? [1-yes/0-no]: ");
                 isContinue = Convert.ToInt32(Console.ReadLine()) == 1;
+                Console.Clear();
             }
 
             File.WriteAllText(file, array.ToString());
@@ -84,8 +93,12 @@ namespace ThingWriter
 
     public class Thing
     {
-        public string ThingName { get; set; }
+        [JsonProperty("thingName_en-US")]
+        public string ThingNameEn { get; set; }
+        [JsonProperty("thingName_ru-RU")]
+        public string ThingNameRu { get; set; }
         public string Type { get; set; }
         public string Category { get; set; }
+        public double Weight { get; set; }
     }
 }
