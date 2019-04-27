@@ -22,7 +22,7 @@ namespace ThingWriter
             var array = new JArray();
             if (File.Exists(file) && new FileInfo(file).Length > 0)
             {
-                array = JArray.Parse(File.ReadAllText(@"all_things.json", Encoding.UTF8));
+                array = JArray.Parse(File.ReadAllText(file, Encoding.UTF8));
             }
             int count = array.Count;
             var isContinue = true;
@@ -38,7 +38,7 @@ namespace ThingWriter
                 Console.WriteLine("Type: ");
                 Console.WriteLine("1 - Документы\n2 - Техника\n3 - Бытовые мелочи, комфорт и удобство\n" +
                     "4 - Гигиена и косметика\n5 - Верхняя одежда\n6 - Повседневная одежда\n7 - Нательное белье\n" +
-                    "8 - Аксессуары\n9 - Украшения\n10 - Выходная одежда\n11 - Обувь\n12 - Головные уборы\n13 - Детские вещи");
+                    "8 - Аксессуары\n9 - Украшения\n10 - Выходная одежда\n11 - Обувь\n12 - Головные уборы\n13 - Детские вещи\n14 - Медицина");
                 var type = Convert.ToInt32(Console.ReadLine());
                 switch (type)
                 {
@@ -49,12 +49,13 @@ namespace ThingWriter
                     case 5: thing.Type = "outerwear"; break;
                     case 6: thing.Type = "casual"; break;
                     case 7: thing.Type = "underwear"; break;
-                    case 8: thing.Type = "accessiores"; break;
+                    case 8: thing.Type = "accessoires"; break;
                     case 9: thing.Type = "decorations"; break;
                     case 10: thing.Type = "dresscode"; break;
                     case 11: thing.Type = "shoes"; break;
                     case 12: thing.Type = "headgear"; break;
                     case 13: thing.Type = "kids"; break;
+                    case 14: thing.Type = "medicine"; break;
                 }
                 Console.WriteLine("Category:");
                 bool isAddMore;
@@ -91,7 +92,35 @@ namespace ThingWriter
                 } while (isAddMore);
                 Console.Write("Weight: ");
                 thing.Weight = Convert.ToDouble(Console.ReadLine());
-
+                Console.Write("Sex: [0-man/1-woman/2-neutral]: ");
+                int sex = Convert.ToInt32(Console.ReadLine());
+                switch (sex)
+                {
+                    case 0: thing.Sex = "man"; break;
+                    case 1: thing.Sex = "woman"; break;
+                    case 2: thing.Sex = "neutral"; break;
+                }
+                Console.WriteLine("Weather type:");
+                thing.WeatherType = string.Empty;
+                do {
+                    Console.WriteLine("1 - Холодно\n2 - Средне\n3 - Тепло\n4 - Жарко\n5 - Дождь\n6 - Любая");
+                    int weather = Convert.ToInt32(Console.ReadLine());
+                    switch (weather)
+                    {
+                        case 1: thing.WeatherType += "cold"; break;
+                        case 2: thing.WeatherType += "normal"; break;
+                        case 3: thing.WeatherType += "warm"; break;
+                        case 4: thing.WeatherType += "hot"; break;
+                        case 5: thing.WeatherType += "rain"; break;
+                        case 6: thing.WeatherType += "any"; break;
+                    }
+                    Console.Write("Add one more weather? [1-yes/0-no]: ");
+                    isAddMore = Convert.ToInt32(Console.ReadLine()) == 1;
+                    if (isAddMore)
+                    {
+                        thing.WeatherType += ",";
+                    }
+                } while (isAddMore);
                 array.Add(JObject.FromObject(thing, serializer));
 
                 Console.Write("Continue? [1-yes/0-no]: ");
@@ -109,8 +138,10 @@ namespace ThingWriter
         public string ThingNameEn { get; set; }
         [JsonProperty("thingName_ru-RU")]
         public string ThingNameRu { get; set; }
+        public string Sex { get; set; }
         public string Type { get; set; }
         public string Category { get; set; }
         public double Weight { get; set; }
+        public string WeatherType { get; set; }
     }
 }
